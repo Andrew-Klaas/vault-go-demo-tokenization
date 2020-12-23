@@ -69,22 +69,6 @@ func Records(w http.ResponseWriter, req *http.Request) {
 		}
 		cRecords[i].Ssn = string(ssn)
 	}
-	// fmt.Printf("users records AFTER decrypt %v\n", cRecords)
-
-	// //HashiCorp Vault decrypt password and check
-	// data := map[string]interface{}{
-	// 	"ciphertext": string(u.Password),
-	// }
-	// b64ptxt, err := config.Vclient.Logical().Write("transit/decrypt/my-key", data)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// s := strings.Split(b64ptxt.Data["plaintext"].(string), ":")
-	// realptxt, err := base64.StdEncoding.DecodeString(s[0])
-	// if string(realptxt) != pw {
-	// 	http.Error(w, "Username and/or password do not match", http.StatusForbidden)
-	// 	return
-	// }
 
 	err = config.TPL.ExecuteTemplate(w, "records.gohtml", cRecords)
 	if err != nil {

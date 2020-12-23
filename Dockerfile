@@ -3,6 +3,7 @@
 FROM golang
 ADD . /go/src/github.com/Andrew-Klaas/vault-go-demo
 WORKDIR /go/src/github.com/Andrew-Klaas/vault-go-demo
+RUN go get github.com/Andrew-Klaas/vault-go-demo
 RUN go get github.com/hashicorp/vault/api
 RUN go get github.com/lib/pq
 RUN go install /go/src/github.com/Andrew-Klaas/vault-go-demo
