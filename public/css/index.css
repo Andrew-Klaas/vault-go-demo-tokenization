@@ -133,9 +133,29 @@ li a:hover {
 }
 
 article {
-    padding: 5rem 10rem;
+    padding: 5rem 7rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    /* border: 5px solid black; */
+}
+p
+img {
+    width: 100vw;
+    height: auto;
+    /* border: 5px solid black; */
+}
+
+#connect {
+    height: 600px;
+    width: 800px;
+}
+
+#dbcreds {
+    height: 350px;
+    width: 800px;
+}
+.main-txt {
+    width: 70%;
 }
