@@ -31,7 +31,7 @@ var httpClient = &http.Client{
 }
 
 //Vclient ...
-var Vclient, _ = api.NewClient(&api.Config{Address: "http://127.0.0.1:8200", HttpClient: httpClient})
+var Vclient, _ = api.NewClient(&api.Config{Address: "http://vault-ui.default.svc:8200", HttpClient: httpClient})
 var tokenPath = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 var K8sAuthRole = "vault_go_demo"
 var K8sAuthPath = "auth/kubernetes/login"
@@ -69,7 +69,7 @@ func init() {
 	}
 	username := data.Data["username"]
 	password := data.Data["password"]
-	SQLQuery := "postgres://" + username.(string) + ":" + password.(string) + "@localhost:5432/vault_go_demo?sslmode=disable"
+	SQLQuery := "postgres://" + username.(string) + ":" + password.(string) + "@pq-postgresql-headless.default.svc:5432/vault_go_demo?sslmode=disable"
 
 	AppDBuser.Username = username.(string)
 	AppDBuser.Password = password.(string)
