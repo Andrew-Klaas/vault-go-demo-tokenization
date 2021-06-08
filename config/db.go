@@ -57,6 +57,7 @@ func init() {
 		log.Fatal(err)
 	}
 	token := secret.Auth.ClientToken
+	fmt.Printf("Vault token: %v", token)
 
 	//Local
 	// token := "password"
