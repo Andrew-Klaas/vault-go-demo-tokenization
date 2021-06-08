@@ -31,7 +31,7 @@ var httpClient = &http.Client{
 }
 
 //Vclient ...
-var Vclient, _ = api.NewClient(&api.Config{Address: "http://vault-ui.default.svc:8200", HttpClient: httpClient})
+var Vclient, _ = api.NewClient(&api.Config{Address: "http://vault-ui.default.svc.cluster.local:8200", HttpClient: httpClient})
 var tokenPath = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 var K8sAuthRole = "vault_go_demo"
 var K8sAuthPath = "auth/kubernetes/login"
