@@ -39,7 +39,7 @@ var K8sAuthPath = "auth/kubernetes/login"
 func init() {
 	//Vault
 	//K8s
-	fmt.Printf("Vault client init...\n")
+	fmt.Printf("Vault client init....\n")
 	buf, err := ioutil.ReadFile(tokenPath)
 	if err != nil {
 		log.Fatal(err)
