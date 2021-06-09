@@ -1,12 +1,10 @@
 package users
 
 import (
-	"encoding/base64"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/Andrew-Klaas/vault-go-demo-tokenization/config"
 )
@@ -55,15 +53,29 @@ func Records(w http.ResponseWriter, req *http.Request) {
 	// fmt.Printf("users records BEFORE decrypt %v\n", cRecords)
 	for i := 3; i < len(cRecords); i++ {
 		u := cRecords[i]
+
 		data := map[string]interface{}{
-			"ciphertext": string(u.Ssn),
+			"value":          u.Ssn,
+			"transformation": "ssn",
 		}
-		response, err := config.Vclient.Logical().Write("transit/decrypt/my-key", data)
+
+		response, err := config.Vclient.Logical().Write("transform/decode/vault_go_demo", data)
 		if err != nil {
 			log.Fatal(err)
 		}
-		ptxt := strings.Split(response.Data["plaintext"].(string), ":")
-		ssn, err := base64.StdEncoding.DecodeString(ptxt[0])
+		decval := response.Data["decoded_value"].(string)
+		fmt.Printf("detokenized value: %v\n", decval)
+		ssn := decval
+
+		// data := map[string]interface{}{
+		// 	"ciphertext": string(u.Ssn),
+		// }
+		// response, err := config.Vclient.Logical().Write("transit/decrypt/my-key", data)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+		// ptxt := strings.Split(response.Data["plaintext"].(string), ":")
+		// ssn, err := base64.StdEncoding.DecodeString(ptxt[0])
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -122,19 +134,31 @@ func Addrecord(w http.ResponseWriter, req *http.Request) {
 		}
 		fmt.Printf("User record to add: %v\n", u)
 
-		//HashiCorp Vault encryption
 		data := map[string]interface{}{
-			"plaintext": base64.StdEncoding.EncodeToString([]byte(u.Ssn)),
+			"value":          u.Ssn,
+			"transformation": "ssn",
 		}
-		response, err := config.Vclient.Logical().Write("transit/encrypt/my-key", data)
+
+		response, err := config.Vclient.Logical().Write("transform/encode/vault_go_demo", data)
 		if err != nil {
 			log.Fatal(err)
 		}
-		ctxt := response.Data["ciphertext"].(string)
-		fmt.Printf("Vault encrypted ssn: %v\n", ctxt)
+		encval := response.Data["encoded_value"].(string)
+		fmt.Printf("tokenized value: %v\n", encval)
 
-		u.Ssn = ctxt
-		fmt.Printf("user record to add post encrypt: %v\n", u)
+		//HashiCorp Vault encryption
+		// data := map[string]interface{}{
+		// 	"plaintext": base64.StdEncoding.EncodeToString([]byte(u.Ssn)),
+		// }
+		// response, err := config.Vclient.Logical().Write("transit/encrypt/my-key", data)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+		// ctxt := response.Data["ciphertext"].(string)
+		// fmt.Printf("Vault encrypted ssn: %v\n", ctxt)
+
+		u.Ssn = encval
+		fmt.Printf("user record to add post tokenization: %v\n", u)
 
 		/*
 			SQLQuery = "INSERT INTO vault_go_demo (FIRST, LAST, SSN, ADDR, BDAY, SALARY) VALUES('Bill', 'Franklin', '111-22-8084', '222 Chicago Street', '1985-02-02', 180000.00);"
@@ -183,18 +207,30 @@ func UpdateRecord(w http.ResponseWriter, req *http.Request) {
 		}
 		// fmt.Printf("User record to update: %v\n", u)
 
-		//HashiCorp Vault encryption
 		data := map[string]interface{}{
-			"plaintext": base64.StdEncoding.EncodeToString([]byte(u.Ssn)),
+			"value":          u.Ssn,
+			"transformation": "ssn",
 		}
-		response, err := config.Vclient.Logical().Write("transit/encrypt/my-key", data)
+
+		response, err := config.Vclient.Logical().Write("transform/encode/vault_go_demo", data)
 		if err != nil {
 			log.Fatal(err)
 		}
-		ctxt := response.Data["ciphertext"].(string)
-		fmt.Printf("Vault encrypted ssn: %v\n", ctxt)
+		encval := response.Data["encoded_value"].(string)
+		fmt.Printf("tokenized value: %v\n", encval)
 
-		u.Ssn = ctxt
+		//HashiCorp Vault encryption
+		// data := map[string]interface{}{
+		// 	"plaintext": base64.StdEncoding.EncodeToString([]byte(u.Ssn)),
+		// }
+		// response, err := config.Vclient.Logical().Write("transit/encrypt/my-key", data)
+		// if err != nil {
+		// 	log.Fatal(err)
+		// }
+		// ctxt := response.Data["ciphertext"].(string)
+		// fmt.Printf("Vault encrypted ssn: %v\n", ctxt)
+
+		u.Ssn = encval
 		fmt.Printf("user record to update (post encrypt): %v\n", u)
 
 		/*
