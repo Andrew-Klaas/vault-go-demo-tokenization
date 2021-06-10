@@ -30,7 +30,6 @@ func DbView(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// fmt.Printf("users records %v\n", cRecords)
 
 	err = config.TPL.ExecuteTemplate(w, "dbview.gohtml", cRecords)
 	if err != nil {
@@ -67,15 +66,6 @@ func Records(w http.ResponseWriter, req *http.Request) {
 		fmt.Printf("detokenized value: %v\n", decval)
 		ssn := decval
 
-		// data := map[string]interface{}{
-		// 	"ciphertext": string(u.Ssn),
-		// }
-		// response, err := config.Vclient.Logical().Write("transit/decrypt/my-key", data)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// ptxt := strings.Split(response.Data["plaintext"].(string), ":")
-		// ssn, err := base64.StdEncoding.DecodeString(ptxt[0])
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -146,24 +136,9 @@ func Addrecord(w http.ResponseWriter, req *http.Request) {
 		encval := response.Data["encoded_value"].(string)
 		fmt.Printf("tokenized value: %v\n", encval)
 
-		//HashiCorp Vault encryption
-		// data := map[string]interface{}{
-		// 	"plaintext": base64.StdEncoding.EncodeToString([]byte(u.Ssn)),
-		// }
-		// response, err := config.Vclient.Logical().Write("transit/encrypt/my-key", data)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// ctxt := response.Data["ciphertext"].(string)
-		// fmt.Printf("Vault encrypted ssn: %v\n", ctxt)
-
 		u.Ssn = encval
 		fmt.Printf("user record to add post tokenization: %v\n", u)
 
-		/*
-			SQLQuery = "INSERT INTO vault_go_demo (FIRST, LAST, SSN, ADDR, BDAY, SALARY) VALUES('Bill', 'Franklin', '111-22-8084', '222 Chicago Street', '1985-02-02', 180000.00);"
-			DB.Exec(SQLQuery)
-		*/
 		_, err = config.DB.Exec("INSERT INTO vault_go_demo (FIRST, LAST, SSN, ADDR, BDAY, SALARY) VALUES ($1, $2, $3, $4, $5, $6)", u.First, u.Last, u.Ssn, u.Addr, u.Bday, u.Salary)
 		if err != nil {
 			log.Fatal(err)
@@ -219,27 +194,9 @@ func UpdateRecord(w http.ResponseWriter, req *http.Request) {
 		encval := response.Data["encoded_value"].(string)
 		fmt.Printf("tokenized value: %v\n", encval)
 
-		//HashiCorp Vault encryption
-		// data := map[string]interface{}{
-		// 	"plaintext": base64.StdEncoding.EncodeToString([]byte(u.Ssn)),
-		// }
-		// response, err := config.Vclient.Logical().Write("transit/encrypt/my-key", data)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// ctxt := response.Data["ciphertext"].(string)
-		// fmt.Printf("Vault encrypted ssn: %v\n", ctxt)
-
 		u.Ssn = encval
 		fmt.Printf("user record to update (post encrypt): %v\n", u)
 
-		/*
-			_, err = db.Exec("UPDATE books SET isbn = $1, title=$2, author=$3, price=$4 WHERE isbn=$1;", bk.Isbn, bk.Title, bk.Author, bk.Price)
-			if err != nil {
-				http.Error(w, http.StatusText(500), http.StatusInternalServerError)
-				return
-			}
-		*/
 		convcn, err := strconv.Atoi(u.Cust_no)
 		if err != nil {
 			log.Fatal(err)
