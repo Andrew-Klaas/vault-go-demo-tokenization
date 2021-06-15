@@ -31,7 +31,7 @@ var httpClient = &http.Client{
 }
 
 //Vclient ...
-var Vclient, _ = api.NewClient(&api.Config{Address: "http://vault-ui.default.svc.cluster.local:8200", HttpClient: httpClient})
+var Vclient, _ = api.NewClient(&api.Config{Address: "http://vault-ui.default.svc:8200", HttpClient: httpClient})
 
 //var Vclient, _ = api.NewClient(&api.Config{Address: "http://127.0.0.1:8200", HttpClient: httpClient})
 var tokenPath = "/var/run/secrets/kubernetes.io/serviceaccount/token"
@@ -39,8 +39,7 @@ var K8sAuthRole = "vault_go_demo"
 var K8sAuthPath = "auth/kubernetes/login"
 
 func init() {
-	//Vault
-	//K8s
+	//vault and K8s auth
 	fmt.Printf("Vault client init....\n")
 
 	buf, err := ioutil.ReadFile(tokenPath)
@@ -61,12 +60,9 @@ func init() {
 		log.Fatal(err)
 	}
 	token := secret.Auth.ClientToken
-	//token := "root"
 
+	//Don't do this in production!
 	fmt.Printf("Vault token: %v", token)
-
-	//Local
-	// token := "password"
 
 	Vclient.SetToken(token)
 
@@ -77,11 +73,11 @@ func init() {
 	username := data.Data["username"]
 	password := data.Data["password"]
 	SQLQuery := "postgres://" + username.(string) + ":" + password.(string) + "@pq-postgresql-headless.default.svc:5432/vault_go_demo?sslmode=disable"
-	//SQLQuery := "postgres://" + username.(string) + ":" + password.(string) + "@127.0.0.1:5432/vault_go_demo?sslmode=disable"
 
 	AppDBuser.Username = username.(string)
 	AppDBuser.Password = password.(string)
 
+	//Don't do this in production!
 	fmt.Printf("\nDB Username: %v\n", AppDBuser.Username)
 	fmt.Printf("DB Password: %v\n\n", AppDBuser.Password)
 
@@ -95,7 +91,6 @@ func init() {
 	}
 	fmt.Println("Connected to database\n")
 
-	// fmt.Println("Populating DB with example users")
 	SQLQuery = "DROP TABLE vault_go_demo;"
 	DB.Exec(SQLQuery)
 	SQLQuery = "CREATE TABLE vault_go_demo (CUST_NO SERIAL PRIMARY KEY, FIRST TEXT NOT NULL, LAST TEXT NOT NULL, SSN TEXT NOT NULL, ADDR CHAR(50), BDAY DATE DEFAULT '1900-01-01', SALARY REAL DEFAULT 25500.00);"
@@ -106,8 +101,6 @@ func init() {
 	DB.Exec(SQLQuery)
 	SQLQuery = "INSERT INTO vault_go_demo (FIRST, LAST, SSN, ADDR, BDAY, SALARY) VALUES('Ben', 'Franklin', '111-22-8084', '222 Chicago Street', '1985-02-02', 180000.00);"
 	DB.Exec(SQLQuery)
-	// SQLQuery = "INSERT INTO vault_go_demo (FIRST, LAST, SSN, ADDR, BDAY, SALARY) VALUES('Bill', 'Franklin', '111-22-8084', '222 Chicago Street', '1985-02-02', 180000.00);"
-	// DB.Exec(SQLQuery)
 
 }
 
