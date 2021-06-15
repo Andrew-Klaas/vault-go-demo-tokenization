@@ -30,16 +30,13 @@ var httpClient = &http.Client{
 	Timeout: 10 * time.Second,
 }
 
-//Vclient ...
+//Vclient holds our HashiCorp Vault Client
 var Vclient, _ = api.NewClient(&api.Config{Address: "http://vault-ui.default.svc:8200", HttpClient: httpClient})
-
-//var Vclient, _ = api.NewClient(&api.Config{Address: "http://127.0.0.1:8200", HttpClient: httpClient})
 var tokenPath = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 var K8sAuthRole = "vault_go_demo"
 var K8sAuthPath = "auth/kubernetes/login"
 
 func init() {
-	//vault and K8s auth
 	fmt.Printf("Vault client init....\n")
 
 	buf, err := ioutil.ReadFile(tokenPath)
@@ -54,18 +51,14 @@ func init() {
 		"role": K8sAuthRole,
 	}
 
+	//Login
 	secret, err1 := Vclient.Logical().Write(K8sAuthPath, config)
 	if err1 != nil {
-		fmt.Printf("Vault login err error%v\n", err)
 		log.Fatal(err)
 	}
-	token := secret.Auth.ClientToken
+	Vclient.SetToken(secret.Auth.ClientToken)
 
-	//Don't do this in production!
-	fmt.Printf("Vault token: %v", token)
-
-	Vclient.SetToken(token)
-
+	//Pull dynamic database credentials
 	data, err := Vclient.Logical().Read("database/creds/vault_go_demo")
 	if err != nil {
 		log.Fatal(err)

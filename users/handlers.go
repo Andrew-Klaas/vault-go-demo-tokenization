@@ -1,7 +1,6 @@
 package users
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -12,7 +11,6 @@ import (
 //Index ...
 func Index(w http.ResponseWriter, req *http.Request) {
 
-	fmt.Printf("username: %v, password %v\n", config.AppDBuser.Username, config.AppDBuser.Password)
 	err := config.TPL.ExecuteTemplate(w, "index.gohtml", config.AppDBuser)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -49,7 +47,6 @@ func Records(w http.ResponseWriter, req *http.Request) {
 		log.Fatal(err)
 	}
 
-	// fmt.Printf("users records BEFORE decrypt %v\n", cRecords)
 	for i := 3; i < len(cRecords); i++ {
 		u := cRecords[i]
 
@@ -63,7 +60,6 @@ func Records(w http.ResponseWriter, req *http.Request) {
 			log.Fatal(err)
 		}
 		decval := response.Data["decoded_value"].(string)
-		fmt.Printf("detokenized value: %v\n", decval)
 		ssn := decval
 
 		if err != nil {
@@ -122,7 +118,6 @@ func Addrecord(w http.ResponseWriter, req *http.Request) {
 			Bday:    bd,
 			Salary:  conSlry,
 		}
-		fmt.Printf("User record to add: %v\n", u)
 
 		data := map[string]interface{}{
 			"value":          u.Ssn,
@@ -134,10 +129,8 @@ func Addrecord(w http.ResponseWriter, req *http.Request) {
 			log.Fatal(err)
 		}
 		encval := response.Data["encoded_value"].(string)
-		fmt.Printf("tokenized value: %v\n", encval)
 
 		u.Ssn = encval
-		fmt.Printf("user record to add post tokenization: %v\n", u)
 
 		_, err = config.DB.Exec("INSERT INTO vault_go_demo (FIRST, LAST, SSN, ADDR, BDAY, SALARY) VALUES ($1, $2, $3, $4, $5, $6)", u.First, u.Last, u.Ssn, u.Addr, u.Bday, u.Salary)
 		if err != nil {
@@ -180,7 +173,6 @@ func UpdateRecord(w http.ResponseWriter, req *http.Request) {
 			Bday:    bd,
 			Salary:  conSlry,
 		}
-		// fmt.Printf("User record to update: %v\n", u)
 
 		data := map[string]interface{}{
 			"value":          u.Ssn,
@@ -192,10 +184,8 @@ func UpdateRecord(w http.ResponseWriter, req *http.Request) {
 			log.Fatal(err)
 		}
 		encval := response.Data["encoded_value"].(string)
-		fmt.Printf("tokenized value: %v\n", encval)
 
 		u.Ssn = encval
-		fmt.Printf("user record to update (post encrypt): %v\n", u)
 
 		convcn, err := strconv.Atoi(u.Cust_no)
 		if err != nil {
