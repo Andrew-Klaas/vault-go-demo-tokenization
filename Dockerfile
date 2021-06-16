@@ -4,6 +4,8 @@ FROM golang
 ADD . /go/src/github.com/Andrew-Klaas/vault-go-demo-tokenization
 WORKDIR /go/src/github.com/Andrew-Klaas/vault-go-demo-tokenization
 RUN go get github.com/Andrew-Klaas/vault-go-demo-tokenization
+RUN go get github.com/hashicorp/hcl/hcl/ast
+RUN go get github.com/cenkalti/backoff/v3
 RUN go get github.com/hashicorp/vault/api
 RUN go get github.com/lib/pq
 RUN go install /go/src/github.com/Andrew-Klaas/vault-go-demo-tokenization
